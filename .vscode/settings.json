@@ -1,0 +1,21 @@
+{
+  "files.exclude": {
+    "node_modules": true,
+    ".npm-offline-cache": true
+  },
+  "editor.formatOnSave": true,
+  "eslint.options": {
+    "configFile": ".eslintrc.js"
+  },
+  "[typescript]": {
+    "editor.formatOnSave": true
+  },
+  "eslint.validate": [
+    "vue",
+    "html",
+    "javascript",
+    "typescript",
+    "javascriptreact",
+    "typescriptreact"
+  ]
+}

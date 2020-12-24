@@ -1,0 +1,8 @@
+.env
+.idea
+.DS_Store
+node_modules
+/dist
+/public
+yarn.lock
+yarn-error.log
