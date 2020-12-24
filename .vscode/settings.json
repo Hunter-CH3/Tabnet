@@ -3,7 +3,6 @@
     "node_modules": true,
     ".npm-offline-cache": true
   },
-  "editor.formatOnSave": true,
   "eslint.options": {
     "configFile": ".eslintrc.js"
   },
@@ -17,5 +16,6 @@
     "typescript",
     "javascriptreact",
     "typescriptreact"
-  ]
+  ],
+  "editor.formatOnSave": true
 }

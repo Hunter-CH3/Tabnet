@@ -1,39 +1,39 @@
 import * as express from 'express';
-import * as path from 'path';
+import * as socketio from 'socket.io';
+import { Socket } from 'socket.io';
+import * as http from 'http';
+import deviceController from './controller';
+import { DeviceType, DeviceInfo } from './interfaces';
+import { validateLocaleAndSetLanguage } from 'typescript';
 
 const app = express();
+
 app.set('port', process.env.PORT || 3000);
 
-const http = require('http').Server(app);
-// set up socket.io and bind it to our
-// http server.
-const io = require('socket.io')(http, {
+const httpServer = new http.Server(app);
+
+const io = new socketio.Server(httpServer, {
   cors: {
     origin: 'http://localhost:8080',
     methods: ['GET', 'POST']
   }
 });
 
-app.get('/', (req: any, res: any) => {
-  // res.sendFile(path.resolve('./client/index.html'));
-});
-
-// whenever a user connects on port 3000 via
-// a websocket, log that a user has connected
-io.on('connection', function (socket: any) {
-  console.log('a user connected');
-  // whenever we receive a 'message' we log it out
-  socket.on('computer', function (message: any) {
-    console.log('From computer: ' + message);
+io.on('connection', function (socket: Socket) {
+  let deviceInfo: DeviceInfo | null;
+  socket.on('init', (deviceType: DeviceType) => {
+    deviceInfo = {
+      deviceType,
+      deviceID: socket.id
+    };
+    deviceController.onConnect(deviceInfo, socket);
   });
-  socket.on('ipad', function (message: any) {
-    console.log('From ipad: ' + message);
-  });
-  socket.on('phone', function (message: any) {
-    console.log('From phone: ' + message);
+  socket.on('message', (message: any) => deviceController.onMessage(deviceInfo, message));
+  socket.once('disconnect', () => {
+    if (deviceInfo) deviceController.onDisconnect(deviceInfo);
   });
 });
 
-const server = http.listen(3000, function () {
+httpServer.listen(3000, function () {
   console.log('listening on *:3000');
 });
