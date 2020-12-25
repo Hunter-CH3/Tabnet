@@ -1,14 +1,21 @@
 <template>
-  <h1>iPad</h1>
+  <div class="iPad">
+    <h1>iPad</h1>
+    <thumbnail />
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import io from 'socket.io-client';
 import { DeviceType } from '../../../src/interfaces';
+import Thumbnail from '../components/Thumbnail.vue';
 
 export default Vue.extend({
   name: 'Home',
+  components: {
+    Thumbnail
+  },
   data() {
     return {
       deviceType: DeviceType.iPad,
@@ -25,3 +32,13 @@ export default Vue.extend({
   }
 });
 </script>
+
+<style scoped>
+.iPad {
+  height: 80vh;
+}
+
+.thumbnail {
+  margin: 0 auto;
+}
+</style>
