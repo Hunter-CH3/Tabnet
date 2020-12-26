@@ -4,7 +4,6 @@
       class="thumbnail-item"
       v-for="item in items"
       :key="item.id"
-      :data-key="item.id"
       :style="{ left: item.position.left + 'px', top: item.position.top + 'px' }"
       ref="thumbnail-items"
     >
@@ -22,10 +21,8 @@ export class ItemInfo {
     top: number;
   };
   text: string;
-  id: number;
-  public constructor(left: number, top: number, id: number, text?: string) {
+  public constructor(left: number, top: number, text?: string) {
     this.position = { left: left, top: top };
-    this.id = id;
     this.text = text;
   }
 }
@@ -34,18 +31,17 @@ export default Vue.extend({
   data() {
     return {
       items: [
-        new ItemInfo(100, 100, 0),
-        new ItemInfo(300, 100, 1),
-        new ItemInfo(500, 100, 2),
-        new ItemInfo(100, 300, 3),
-        new ItemInfo(300, 300, 4),
-        new ItemInfo(500, 300, 5)
+        new ItemInfo(100, 100),
+        new ItemInfo(300, 100),
+        new ItemInfo(500, 100),
+        new ItemInfo(100, 300),
+        // new ItemInfo(300, 300),
+        new ItemInfo(500, 300)
       ]
     };
   },
   methods: {
     selectItem(id: number) {
-      // const item = this.$refs['thumbnail-items'].find((el: any) => el.getAttribute('data-key') === id);
       this.$refs['thumbnail-items'][id]?.classList.add('selected');
     },
     unselectItem(id: number) {
