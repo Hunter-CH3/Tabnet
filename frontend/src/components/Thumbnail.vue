@@ -16,7 +16,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-class ItemInfo {
+export class ItemInfo {
   position: {
     left: number;
     top: number;
@@ -46,10 +46,10 @@ export default Vue.extend({
   methods: {
     selectItem(id: number) {
       // const item = this.$refs['thumbnail-items'].find((el: any) => el.getAttribute('data-key') === id);
-      this.$refs['thumbnail-items'][id].classList.add('selected');
+      this.$refs['thumbnail-items'][id]?.classList.add('selected');
     },
     unselectItem(id: number) {
-      this.$refs['thumbnail-items'][id].classList.remove('selected');
+      this.$refs['thumbnail-items'][id]?.classList.remove('selected');
     }
   }
 });

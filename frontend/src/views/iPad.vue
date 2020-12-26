@@ -1,7 +1,7 @@
 <template>
-  <div class="iPad">
+  <div class="iPad" @mousedown="onSelectStart" @mouseup="onSelectEnd" @mousemove="updateSelectedTarget">
     <h1>iPad</h1>
-    <thumbnail />
+    <thumbnail ref="thumbnail" />
   </div>
 </template>
 
@@ -9,7 +9,7 @@
 import Vue from 'vue';
 import io from 'socket.io-client';
 import { DeviceType } from '../../../src/interfaces';
-import Thumbnail from '../components/Thumbnail.vue';
+import Thumbnail, { ItemInfo } from '../components/Thumbnail.vue';
 
 export default Vue.extend({
   name: 'Home',
@@ -20,7 +20,10 @@ export default Vue.extend({
     return {
       deviceType: DeviceType.iPad,
       socket: io.io('http://localhost:3000'),
-      users: []
+      users: [],
+      items: null,
+      selStartPos: null,
+      selId: null
     };
   },
   mounted() {
@@ -29,6 +32,31 @@ export default Vue.extend({
     this.socket.on('message', (message: any) => {
       console.log(message);
     });
+  },
+  methods: {
+    onSelectStart(event: MouseEvent) {
+      const thumbnail = this.$refs.thumbnail;
+      this.items = thumbnail.items as ItemInfo[];
+      this.selStartPos = { x: event.x, y: event.y };
+    },
+    onSelectEnd() {
+      if (this.selId === null) {
+        this.selId = 0;
+      } else {
+        this.selId = (this.selId + 1) % this.items.length;
+      }
+    },
+    updateSelectedTarget(event: MouseEvent) {
+      console.log(event);
+    }
+  },
+  watch: {
+    selId(newId, oldId) {
+      if (newId !== null) {
+        if (oldId !== null) this.$refs.thumbnail.unselectItem(oldId);
+        this.$refs.thumbnail.selectItem(newId);
+      }
+    }
   }
 });
 </script>
