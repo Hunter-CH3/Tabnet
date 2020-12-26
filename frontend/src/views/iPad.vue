@@ -1,5 +1,5 @@
 <template>
-  <div class="iPad" @mousedown="onSelectStart" @mouseup="onSelectEnd" @mousemove="updateSelectedTarget">
+  <div class="iPad" @touchstart="onSelectStart" @touchend="onSelectEnd" @touchmove="updateSelectedTarget">
     <h1>iPad</h1>
     <thumbnail ref="thumbnail" />
   </div>
@@ -34,7 +34,7 @@ export default Vue.extend({
     });
   },
   methods: {
-    onSelectStart(event: MouseEvent) {
+    onSelectStart(event: TouchEvent) {
       const thumbnail = this.$refs.thumbnail;
       this.items = thumbnail.items as ItemInfo[];
       this.selStartPos = { x: event.x, y: event.y };
@@ -46,7 +46,7 @@ export default Vue.extend({
         this.selId = (this.selId + 1) % this.items.length;
       }
     },
-    updateSelectedTarget(event: MouseEvent) {
+    updateSelectedTarget(event: TouchEvent) {
       console.log(event);
     }
   },
@@ -68,5 +68,26 @@ export default Vue.extend({
 
 .thumbnail {
   margin: 0 auto;
+}
+
+* {
+  -webkit-touch-callout: none;
+
+  /* iOS Safari */
+  -webkit-user-select: none;
+
+  /* Safari */
+  -khtml-user-select: none;
+
+  /* Konqueror HTML */
+  -moz-user-select: none;
+
+  /* Firefox */
+  -ms-user-select: none;
+
+  /* Internet Explorer/Edge */
+  user-select: none;
+
+  /* Non-prefixed version, currently supported by Chrome and Opera */
 }
 </style>

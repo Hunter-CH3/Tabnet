@@ -21,3 +21,4 @@ yarn
 yarn serve
 ```
 
+iOS Safari上的触摸事件有问题，实验的时候请使用Chrome。
