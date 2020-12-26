@@ -1,5 +1,13 @@
 <template>
-  <div class="iPad" @touchstart="onSelectStart" @touchend="onSelectEnd" @touchmove="updateSelectedTarget">
+  <div
+    class="iPad"
+    @touchstart="onSelectStart"
+    @touchend="onSelectEnd"
+    @touchmove="updateSelectedTarget"
+    @mousedown="onSelectStart"
+    @mouseup="onSelectEnd"
+    @mousemove="updateSelectedTarget"
+  >
     <h1>iPad</h1>
     <thumbnail ref="thumbnail" />
   </div>
@@ -10,6 +18,55 @@ import Vue from 'vue';
 import io from 'socket.io-client';
 import { DeviceType } from '../../../src/interfaces';
 import Thumbnail, { ItemInfo } from '../components/Thumbnail.vue';
+
+class Pos {
+  x: number;
+  y: number;
+  public constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+  toString(): string {
+    return `x: ${this.x}, y: ${this.y}`;
+  }
+}
+
+function getPosFromEvent(event: TouchEvent | MouseEvent): { x: number; y: number } {
+  if (event instanceof TouchEvent) {
+    const touches = event.touches;
+    const pos = { x: 0, y: 0 };
+    for (let i = 0; i < touches.length; i++) {
+      const touch = touches.item(i);
+      pos.x += touch.clientX;
+      pos.y += touch.clientY;
+    }
+    pos.x /= touches.length;
+    pos.y /= touches.length;
+    return pos;
+  } else {
+    return new Pos(event.x, event.y);
+  }
+}
+
+enum SolverType {
+  ABSOLUTE, // 用户的输入通过线性的映射直接作用到桌面物体坐标上
+  INCREMENTAL // 增量式修正，例如用户一开始移到了某一个位置，某物体亮；用户再向右修正（一个阈值），目标自动更新到该物体右侧的物体上
+}
+
+class AbsoluteSelectionSolver {
+  private startPos: Pos;
+  private userPos: Pos;
+  private items: ItemInfo[];
+  public constructor(items: ItemInfo[], userPos: Pos, startPos: Pos) {
+    this.items = items;
+    this.userPos = userPos;
+    this.startPos = startPos;
+  }
+  public solve(currentPos: Pos): number {
+    console.log(`current position: ${currentPos}`);
+    return 0;
+  }
+}
 
 export default Vue.extend({
   name: 'Home',
@@ -22,8 +79,9 @@ export default Vue.extend({
       socket: io.io('http://localhost:3000'),
       users: [],
       items: null,
-      selStartPos: null,
-      selId: null
+      selId: null,
+      userPos: new Pos(300, 300),
+      solver: null
     };
   },
   mounted() {
@@ -34,20 +92,23 @@ export default Vue.extend({
     });
   },
   methods: {
-    onSelectStart(event: TouchEvent) {
+    onSelectStart(event: TouchEvent | MouseEvent) {
       const thumbnail = this.$refs.thumbnail;
       this.items = thumbnail.items as ItemInfo[];
-      this.selStartPos = { x: event.x, y: event.y };
+      const startPos = getPosFromEvent(event);
+      this.solver = new AbsoluteSelectionSolver(this.items, this.userPos, startPos);
+      // TODO: inform the server of showing thumbnail
     },
     onSelectEnd() {
-      if (this.selId === null) {
-        this.selId = 0;
-      } else {
-        this.selId = (this.selId + 1) % this.items.length;
-      }
+      this.socket.emit('message', `selected item: ${this.selId}`);
+      this.solver = null;
+      // TODO: inform the server of the end of selection
     },
-    updateSelectedTarget(event: TouchEvent) {
-      console.log(event);
+    updateSelectedTarget(event: TouchEvent | MouseEvent) {
+      const currentPos = getPosFromEvent(event);
+      if (this.solver) {
+        this.selId = this.solver.solve(currentPos);
+      }
     }
   },
   watch: {
@@ -55,6 +116,7 @@ export default Vue.extend({
       if (newId !== null) {
         if (oldId !== null) this.$refs.thumbnail.unselectItem(oldId);
         this.$refs.thumbnail.selectItem(newId);
+        // TODO: inform the server of updating selected target
       }
     }
   }
