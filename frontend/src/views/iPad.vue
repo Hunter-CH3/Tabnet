@@ -57,14 +57,30 @@ class AbsoluteSelectionSolver {
   private startPos: Pos;
   private userPos: Pos;
   private items: ItemInfo[];
+  private tableSize = { width: 600, height: 400 };
+  private ratio = 0.4;
   public constructor(items: ItemInfo[], userPos: Pos, startPos: Pos) {
     this.items = items;
     this.userPos = userPos;
     this.startPos = startPos;
   }
   public solve(currentPos: Pos): number {
-    console.log(`current position: ${currentPos}`);
-    return 0;
+    const deltaX = currentPos.x - this.startPos.x;
+    const deltaY = currentPos.y - this.startPos.y;
+    const realX = this.userPos.x + deltaX / this.ratio;
+    const realY = this.userPos.y + deltaY / this.ratio;
+
+    let selId = null;
+    let minDisSq = 100 ** 2;
+    for (let i = 0; i < this.items.length; i++) {
+      const item = this.items[i];
+      const curDisSq = (realX - item.position.left) ** 2 + (realY - item.position.top) ** 2;
+      if (curDisSq < minDisSq) {
+        selId = i;
+        minDisSq = curDisSq;
+      }
+    }
+    return selId;
   }
 }
 
@@ -113,8 +129,9 @@ export default Vue.extend({
   },
   watch: {
     selId(newId, oldId) {
+      console.log(newId, oldId);
+      this.$refs.thumbnail.unselectItem(oldId);
       if (newId !== null) {
-        if (oldId !== null) this.$refs.thumbnail.unselectItem(oldId);
         this.$refs.thumbnail.selectItem(newId);
         // TODO: inform the server of updating selected target
       }
