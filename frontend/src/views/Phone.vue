@@ -20,7 +20,7 @@ export default Vue.extend({
       users: [],
       title: '',
       content: '',
-	  receiving: false
+      receiving: false
     };
   },
   mounted() {
@@ -31,19 +31,19 @@ export default Vue.extend({
     });
     this.socket.on(MsgType.PCToPhone, (message: string) => {
       const data = JSON.parse(message);
-	  this.receiving = true;
+      this.receiving = true;
       this.title = data.title;
       this.content = data.content;
     });
   },
   methods: {
     onTextChange(value: string | number) {
-	  if (this.receiving) {
-		  this.receiving = false;
-		  return;
-	  }
+      if (this.receiving) {
+        this.receiving = false;
+        return;
+      }
       this.socket.emit(MsgType.PhoneToPC, JSON.stringify({ title: this.title, content: this.content }));
-	}
+    }
   }
 });
 </script>
