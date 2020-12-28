@@ -2,8 +2,9 @@
   <div class="thumbnail">
     <div
       class="thumbnail-item"
-      v-for="item in items"
-      :key="item.id"
+      v-for="(item, idx) in items"
+      :key="idx"
+      @click="selectItem(idx)"
       :style="{ left: item.position.left + 'px', top: item.position.top + 'px' }"
       ref="thumbnail-items"
     >
@@ -24,10 +25,15 @@ export default Vue.extend({
   },
   methods: {
     selectItem(id: number) {
-      this.$refs['thumbnail-items'][id]?.classList.add('selected');
-    },
-    unselectItem(id: number) {
-      this.$refs['thumbnail-items'][id]?.classList.remove('selected');
+      for (let i = 0; i < this.$refs['thumbnail-items'].length; i++) {
+        const item = this.$refs['thumbnail-items'][i];
+        if (i === id) {
+          item.classList.add('selected');
+          this.$emit('item-selected', id);
+        } else {
+          item.classList.remove('selected');
+        }
+      }
     }
   }
 });

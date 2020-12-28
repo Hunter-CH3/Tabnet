@@ -21,11 +21,16 @@
       <div class="file-gallery"></div>
       <el-dialog title="与会者" :visible.sync="userDialogVisible">
         <div v-if="howToShowUsers === 'list'">
-          <div v-for="(item, idx) in items" :key="idx">
+          <div v-for="(item, idx) in items" :key="idx" @click="handleItemSelected(idx)">
             {{ item.text }}
           </div>
         </div>
-        <thumbnail id="thumbnail" v-show="howToShowUsers === 'thumbnail'" ref="thumbnail" />
+        <thumbnail
+          id="thumbnail"
+          v-show="howToShowUsers === 'thumbnail'"
+          ref="thumbnail"
+          @item-selected="handleItemSelected"
+        />
       </el-dialog>
     </div>
   </div>
@@ -53,6 +58,7 @@ export default Vue.extend({
       userDialogVisible: false,
       howToShowUsers: 'thumbnail',
       items: items,
+      selId: null,
       status: 'None',
       title: '',
       content: '',
@@ -77,6 +83,16 @@ export default Vue.extend({
       this.title = data.title;
       this.content = data.content;
     });
+
+    this.socket.on(MsgType.TableSelection, (message: string) => {
+      if (message === 'TableSelectOn') {
+        this.userDialogVisible = true;
+      } else if (message === 'TableSelectEnd') {
+        this.handleItemSelected(this.selId);
+      } else {
+        this.selId = Number.parseInt(message);
+      }
+    });
   },
   methods: {
     onTextChange(value: string | number) {
@@ -85,6 +101,16 @@ export default Vue.extend({
         return;
       }
       this.socket.emit(MsgType.PCToPhone, JSON.stringify({ title: this.title, content: this.content }));
+    },
+    handleItemSelected(idx: number) {
+      console.log(idx);
+      this.userDialogVisible = false;
+      this.$refs.thumbnail.selectItem(-1);
+    }
+  },
+  watch: {
+    selId(newId: number) {
+      this.$refs.thumbnail.selectItem(newId);
     }
   }
 });

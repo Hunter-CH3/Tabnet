@@ -16,7 +16,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import io from 'socket.io-client';
-import { DeviceType } from '../../../src/interfaces';
+import { DeviceType, MsgType } from '../../../src/interfaces';
 import Thumbnail from '../components/Thumbnail.vue';
 import { ItemInfo } from '../scene';
 
@@ -115,11 +115,13 @@ export default Vue.extend({
       const startPos = getPosFromEvent(event);
       this.solver = new AbsoluteSelectionSolver(this.items, this.userPos, startPos);
       // TODO: inform the server of showing thumbnail
+      this.socket.emit(MsgType.TableSelection, 'OnSelectStart');
     },
     onSelectEnd() {
       this.socket.emit('message', `selected item: ${this.selId}`);
       this.solver = null;
       // TODO: inform the server of the end of selection
+      this.socket.emit(MsgType.TableSelection, 'OnSelectEnd');
     },
     updateSelectedTarget(event: TouchEvent | MouseEvent) {
       const currentPos = getPosFromEvent(event);
@@ -131,10 +133,10 @@ export default Vue.extend({
   watch: {
     selId(newId, oldId) {
       console.log(newId, oldId);
-      this.$refs.thumbnail.unselectItem(oldId);
       if (newId !== null) {
         this.$refs.thumbnail.selectItem(newId);
         // TODO: inform the server of updating selected target
+        this.socket.emit(MsgType.TableSelection, newId);
       }
     }
   }
