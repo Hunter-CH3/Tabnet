@@ -30,10 +30,16 @@ io.on('connection', function (socket: Socket) {
   });
   socket.on('message', (message: any) => deviceController.onMessage(deviceInfo, message));
   socket.on('scenario', (message: any) => {
-    if (message == MsgType.SingleScenario) {
-      deviceController.emit(deviceInfo, 'scenario', message);
-      console.log(`Scenario changed to ${message}`);
-    }
+    deviceController.idToSocket.forEach((value, key) => {
+      if (key.deviceType == DeviceType.Computer)
+        deviceController.emit(key, 'scenario', message);
+    });
+  });
+  socket.on(MsgType.TableSelection, (message: any) => {
+    deviceController.idToSocket.forEach((value, key) => {
+      if (key.deviceType == DeviceType.Computer)
+        deviceController.emit(key, MsgType.TableSelection, message);
+    });
   });
   socket.on(MsgType.PhoneToPC, (message: any) => {
     deviceController.idToSocket.forEach((value, key) => {
