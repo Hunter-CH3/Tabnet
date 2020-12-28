@@ -2,9 +2,7 @@
   <div>
     <h1>Computer</h1>
     {{ status }}
-    <el-input type="ptextarea" :rows="2" placeholder="Please input" v-model="textarea"> </el-input>
-    <el-input v-model="title" placeholder="title"></el-input>
-    <el-input v-model="content" type="textarea" placeholder="content"></el-input>
+    <el-input type="textarea" :rows="2" placeholder="Please input" v-model="textarea" @input="onTextChange"> </el-input>
   </div>
 </template>
 
@@ -37,6 +35,11 @@ export default Vue.extend({
       this.status = message;
       console.log(message);
     });
+  },
+  methods: {
+    onTextChange(value: string | number) {
+      this.socket.emit('text', value);
+    }
   }
 });
 </script>
