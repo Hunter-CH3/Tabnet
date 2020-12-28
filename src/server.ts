@@ -35,6 +35,12 @@ io.on('connection', function (socket: Socket) {
         deviceController.emit(key, 'scenario', message);
     });
   });
+  socket.on(MsgType.TableSelection, (message: any) => {
+    deviceController.idToSocket.forEach((value, key) => {
+      if (key.deviceType == DeviceType.Computer)
+        deviceController.emit(key, MsgType.TableSelection, message);
+    });
+  });
   socket.on(MsgType.PhoneToPC, (message: any) => {
     deviceController.idToSocket.forEach((value, key) => {
       if (key.deviceType == DeviceType.Computer)
