@@ -1,8 +1,8 @@
 <template>
   <div class="phone">
     <h1>Phone</h1>
-    <el-input v-model="title" placeholder="title"></el-input>
-    <el-input v-model="content" type="textarea" placeholder="content"></el-input>
+    <el-input v-model="title" placeholder="title" @input="onTextChange"></el-input>
+    <el-input v-model="content" type="textarea" placeholder="content" @input="onTextChange"></el-input>
   </div>
 </template>
 
@@ -19,7 +19,8 @@ export default Vue.extend({
       socket: io.io('http://localhost:3000'),
       users: [],
       title: '',
-      content: ''
+      content: '',
+	  receiving: false
     };
   },
   mounted() {
@@ -28,14 +29,21 @@ export default Vue.extend({
     this.socket.on('message', (message: any) => {
       console.log(message);
     });
-    window.setInterval(() => {
-      this.socket.emit('message', JSON.stringify({ title: this.title, content: this.content }));
-    }, 1000);
-    this.socket.on('message', (message: string) => {
+    this.socket.on(MsgType.PCToPhone, (message: string) => {
       const data = JSON.parse(message);
+	  this.receiving = true;
       this.title = data.title;
       this.content = data.content;
     });
+  },
+  methods: {
+    onTextChange(value: string | number) {
+	  if (this.receiving) {
+		  this.receiving = false;
+		  return;
+	  }
+      this.socket.emit(MsgType.PhoneToPC, JSON.stringify({ title: this.title, content: this.content }));
+	}
   }
 });
 </script>

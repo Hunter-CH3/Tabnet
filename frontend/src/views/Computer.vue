@@ -22,7 +22,8 @@ export default Vue.extend({
       users: [],
       status: 'None',
 	  title: '',
-	  content: ''
+	  content: '',
+	  receiving: false
     };
   },
   mounted() {
@@ -39,12 +40,17 @@ export default Vue.extend({
 	// receive sync message from phone
 	this.socket.on(MsgType.PhoneToPC, (message: string) => {
       const data = JSON.parse(message);
+	  this.receiving = true;
       this.title = data.title;
       this.content = data.content;
 	});
   },
   methods: {
     onTextChange(value: string | number) {
+	  if (this.receiving) {
+		  this.receiving = false;
+		  return;
+	  }
 	  this.socket.emit(MsgType.PCToPhone,
 					   JSON.stringify({ title: this.title, content: this.content }));
     }
