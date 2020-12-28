@@ -3,7 +3,7 @@ import * as socketio from 'socket.io';
 import { Socket } from 'socket.io';
 import * as http from 'http';
 import deviceController from './controller';
-import { DeviceType, DeviceInfo } from './interfaces';
+import { DeviceType, DeviceInfo, MsgType } from './interfaces';
 import { validateLocaleAndSetLanguage } from 'typescript';
 
 const app = express();
@@ -19,7 +19,7 @@ const io = new socketio.Server(httpServer, {
   }
 });
 
-io.on('connection', function (socket: Socket) {
+io.on('connection', function(socket: Socket) {
   let deviceInfo: DeviceInfo | null;
   socket.on('init', (deviceType: DeviceType) => {
     deviceInfo = {
@@ -29,11 +29,17 @@ io.on('connection', function (socket: Socket) {
     deviceController.onConnect(deviceInfo, socket);
   });
   socket.on('message', (message: any) => deviceController.onMessage(deviceInfo, message));
+  socket.on('scenario', (message: any) => {
+    if (message == MsgType.SingleScenario) {
+      deviceController.emit(deviceInfo, 'scenario', message);
+      console.log(`Scenario changed to ${message}`);
+    }
+  });
   socket.once('disconnect', () => {
     if (deviceInfo) deviceController.onDisconnect(deviceInfo);
   });
 });
 
-httpServer.listen(3000, function () {
+httpServer.listen(3000, function() {
   console.log('listening on *:3000');
 });
