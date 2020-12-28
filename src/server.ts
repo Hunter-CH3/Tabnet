@@ -47,6 +47,18 @@ io.on('connection', function (socket: Socket) {
         deviceController.emit(key, MsgType.PCToPhone, message);
     });
   });
+  socket.on(MsgType.SingleScenario, (message: any) => {
+    deviceController.idToSocket.forEach((value, key) => {
+      if (key.deviceType == DeviceType.Computer)
+        deviceController.emit(key, 'scenario', MsgType.SingleScenario);
+    });
+  });
+  socket.on(MsgType.MeetingScenario, (message: any) => {
+    deviceController.idToSocket.forEach((value, key) => {
+      if (key.deviceType == DeviceType.Computer)
+        deviceController.emit(key, 'scenario', MsgType.MeetingScenario);
+    });
+  });
   socket.once('disconnect', () => {
     if (deviceInfo) deviceController.onDisconnect(deviceInfo);
   });
