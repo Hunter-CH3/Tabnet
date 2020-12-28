@@ -30,10 +30,10 @@ io.on('connection', function (socket: Socket) {
   });
   socket.on('message', (message: any) => deviceController.onMessage(deviceInfo, message));
   socket.on('scenario', (message: any) => {
-    if (message == MsgType.SingleScenario) {
-      deviceController.emit(deviceInfo, 'scenario', message);
-      console.log(`Scenario changed to ${message}`);
-    }
+    deviceController.idToSocket.forEach((value, key) => {
+      if (key.deviceType == DeviceType.Computer)
+        deviceController.emit(key, 'scenario', message);
+    });
   });
   socket.on(MsgType.PhoneToPC, (message: any) => {
     deviceController.idToSocket.forEach((value, key) => {
@@ -45,18 +45,6 @@ io.on('connection', function (socket: Socket) {
     deviceController.idToSocket.forEach((value, key) => {
       if (key.deviceType == DeviceType.Phone)
         deviceController.emit(key, MsgType.PCToPhone, message);
-    });
-  });
-  socket.on(MsgType.SingleScenario, (message: any) => {
-    deviceController.idToSocket.forEach((value, key) => {
-      if (key.deviceType == DeviceType.Computer)
-        deviceController.emit(key, 'scenario', MsgType.SingleScenario);
-    });
-  });
-  socket.on(MsgType.MeetingScenario, (message: any) => {
-    deviceController.idToSocket.forEach((value, key) => {
-      if (key.deviceType == DeviceType.Computer)
-        deviceController.emit(key, 'scenario', MsgType.MeetingScenario);
     });
   });
   socket.once('disconnect', () => {
