@@ -1,5 +1,13 @@
 <template>
+  <div>
   <h1>Computer</h1>
+  <el-input
+  type="textarea"
+  :rows="2"
+  placeholder="Please input"
+  v-model="textarea">
+  </el-input>
+  </div>
 </template>
 
 <script lang="ts">
@@ -13,7 +21,8 @@ export default Vue.extend({
     return {
       deviceType: DeviceType.Computer,
       socket: io.io('http://localhost:3000'),
-      users: []
+      users: [],
+	  textarea: ''
     };
   },
   mounted() {
