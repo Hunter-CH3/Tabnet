@@ -19,7 +19,7 @@ const io = new socketio.Server(httpServer, {
   }
 });
 
-io.on('connection', function (socket: Socket) {
+io.on('connection', function(socket: Socket) {
   let deviceInfo: DeviceInfo | null;
   socket.on('init', (deviceType: DeviceType) => {
     deviceInfo = {
@@ -29,9 +29,9 @@ io.on('connection', function (socket: Socket) {
     deviceController.onConnect(deviceInfo, socket);
   });
   socket.on('message', (message: any) => deviceController.onMessage(deviceInfo, message));
-  socket.on("scenario", (message: any) => {
+  socket.on('scenario', (message: any) => {
     if (message == MsgType.SingleScenario) {
-      deviceController.emit(deviceInfo, "scenario", message);
+      deviceController.emit(deviceInfo, 'scenario', message);
       console.log(`Scenario changed to ${message}`);
     }
   });
@@ -40,6 +40,6 @@ io.on('connection', function (socket: Socket) {
   });
 });
 
-httpServer.listen(3000, function () {
+httpServer.listen(3000, function() {
   console.log('listening on *:3000');
 });

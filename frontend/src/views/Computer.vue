@@ -2,6 +2,7 @@
   <div>
     <h1>Computer</h1>
     {{ status }}
+    <el-input type="textarea" :rows="2" placeholder="Please input" v-model="textarea"> </el-input>
   </div>
 </template>
 
@@ -17,7 +18,8 @@ export default Vue.extend({
       deviceType: DeviceType.Computer,
       socket: io.io('http://localhost:3000'),
       users: [],
-      status: 'None'
+      status: 'None',
+      textarea: ''
     };
   },
   mounted() {
