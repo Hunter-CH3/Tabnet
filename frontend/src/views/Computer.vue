@@ -2,7 +2,8 @@
   <div>
     <h1>Computer</h1>
 	{{ status }}
-    <el-input type="textarea" :rows="2" placeholder="Please input" v-model="textarea"
+    <el-input v-model="title" placeholder="title" @input="onTextChange"></el-input>
+    <el-input type="textarea" :autosize="{ minRows: 10 }" placeholder="Please input" v-model="content"
 	 @input="onTextChange"> </el-input>
   </div>
 </template>
@@ -20,7 +21,8 @@ export default Vue.extend({
       socket: io.io('http://localhost:3000'),
       users: [],
       status: 'None',
-      textarea: ''
+	  title: '',
+	  content: ''
     };
   },
   mounted() {
@@ -34,10 +36,17 @@ export default Vue.extend({
       this.status = message;
       console.log(message);
     });
+	// receive sync message from phone
+	this.socket.on(MsgType.PhoneToPC, (message: string) => {
+      const data = JSON.parse(message);
+      this.title = data.title;
+      this.content = data.content;
+	});
   },
   methods: {
     onTextChange(value: string | number) {
-	  this.socket.emit('text', value);
+	  this.socket.emit(MsgType.PCToPhone,
+					   JSON.stringify({ title: this.title, content: this.content }));
     }
   }
 });
