@@ -2,7 +2,15 @@
   <div>
     <div v-if="!isMeeting">
       <h1>Computer</h1>
-      <el-input type="textarea" :rows="2" placeholder="Please input" v-model="textarea"> </el-input>
+      <el-input v-model="title" placeholder="title" @input="onTextChange"></el-input>
+      <el-input
+        type="textarea"
+        :autosize="{ minRows: 10 }"
+        placeholder="Please input"
+        v-model="content"
+        @input="onTextChange"
+      >
+      </el-input>
     </div>
     <div v-else>
       <div class="menu-wrapper">
@@ -26,9 +34,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import io from 'socket.io-client';
-import { DeviceType } from '../../../src/interfaces';
 import Thumbnail from '../components/Thumbnail.vue';
 import { items } from '../scene';
+import { DeviceType, MsgType } from '../../../src/interfaces';
 
 export default Vue.extend({
   name: 'Home',
@@ -40,23 +48,44 @@ export default Vue.extend({
       deviceType: DeviceType.Computer,
       socket: io.io('http://localhost:3000'),
       users: [],
-      textarea: '',
       isMeeting: true,
       showUserButton: true,
       userDialogVisible: false,
       howToShowUsers: 'thumbnail',
-      items: items
+      items: items,
+      status: 'None',
+      title: '',
+      content: '',
+      receiving: false
     };
   },
   mounted() {
     this.socket.emit('init', this.deviceType);
     this.socket.emit('message', `From ${DeviceType[this.deviceType]}`);
+    this.socket.emit('scenario', MsgType.SingleScenario);
     this.socket.on('message', (message: any) => {
       console.log(message);
     });
+    this.socket.on('scenario', (message: any) => {
+      this.status = message;
+      console.log(message);
+    });
+    // receive sync message from phone
+    this.socket.on(MsgType.PhoneToPC, (message: string) => {
+      const data = JSON.parse(message);
+      this.receiving = true;
+      this.title = data.title;
+      this.content = data.content;
+    });
   },
   methods: {
-    handleItemSelected() {}
+    onTextChange(value: string | number) {
+      if (this.receiving) {
+        this.receiving = false;
+        return;
+      }
+      this.socket.emit(MsgType.PCToPhone, JSON.stringify({ title: this.title, content: this.content }));
+    }
   }
 });
 </script>
