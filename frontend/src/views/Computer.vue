@@ -48,7 +48,7 @@ export default Vue.extend({
       deviceType: DeviceType.Computer,
       socket: io.io('http://localhost:3000'),
       users: [],
-      isMeeting: true,
+      isMeeting: false,
       showUserButton: true,
       userDialogVisible: false,
       howToShowUsers: 'thumbnail',
@@ -62,12 +62,14 @@ export default Vue.extend({
   mounted() {
     this.socket.emit('init', this.deviceType);
     this.socket.emit('message', `From ${DeviceType[this.deviceType]}`);
-    this.socket.emit('scenario', MsgType.SingleScenario);
+    // this.socket.emit('scenario', MsgType.SingleScenario);
     this.socket.on('message', (message: any) => {
       console.log(message);
     });
     this.socket.on('scenario', (message: any) => {
       this.status = message;
+	  if (this.status == MsgType.SingleScenario) this.isMeeting = false;
+	  else this.isMeeting = true;
       console.log(message);
     });
     // receive sync message from phone

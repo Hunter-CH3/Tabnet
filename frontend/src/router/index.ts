@@ -4,6 +4,7 @@ import Home from '../views/Home.vue';
 import Computer from '../views/Computer.vue';
 import iPad from '../views/iPad.vue';
 import Phone from '../views/Phone.vue';
+import BackDoor from '../views/BackDoor.vue';
 
 Vue.use(VueRouter);
 
@@ -27,6 +28,11 @@ const routes: Array<RouteConfig> = [
     path: '/phone',
     name: 'Phone',
     component: Phone
+  },
+  {
+	path: '/backdoor',
+	name: 'backdoor',
+	component: BackDoor
   }
 ];
 
