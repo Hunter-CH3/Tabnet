@@ -19,7 +19,7 @@ const io = new socketio.Server(httpServer, {
   }
 });
 
-io.on('connection', function(socket: Socket) {
+io.on('connection', function (socket: Socket) {
   let deviceInfo: DeviceInfo | null;
   socket.on('init', (deviceType: DeviceType) => {
     deviceInfo = {
@@ -35,11 +35,23 @@ io.on('connection', function(socket: Socket) {
       console.log(`Scenario changed to ${message}`);
     }
   });
+  socket.on(MsgType.PhoneToPC, (message: any) => {
+    deviceController.idToSocket.forEach((value, key) => {
+      if (key.deviceType == DeviceType.Computer)
+        deviceController.emit(key, MsgType.PhoneToPC, message);
+    });
+  });
+  socket.on(MsgType.PCToPhone, (message: any) => {
+    deviceController.idToSocket.forEach((value, key) => {
+      if (key.deviceType == DeviceType.Phone)
+        deviceController.emit(key, MsgType.PCToPhone, message);
+    });
+  });
   socket.once('disconnect', () => {
     if (deviceInfo) deviceController.onDisconnect(deviceInfo);
   });
 });
 
-httpServer.listen(3000, function() {
+httpServer.listen(3000, function () {
   console.log('listening on *:3000');
 });

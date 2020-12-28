@@ -2,7 +2,9 @@
   <div>
     <h1>Computer</h1>
     {{ status }}
-    <el-input type="textarea" :rows="2" placeholder="Please input" v-model="textarea"> </el-input>
+    <el-input type="ptextarea" :rows="2" placeholder="Please input" v-model="textarea"> </el-input>
+    <el-input v-model="title" placeholder="title"></el-input>
+    <el-input v-model="content" type="textarea" placeholder="content"></el-input>
   </div>
 </template>
 
@@ -19,7 +21,9 @@ export default Vue.extend({
       socket: io.io('http://localhost:3000'),
       users: [],
       status: 'None',
-      textarea: ''
+      textarea: '',
+      title: '',
+      content: ''
     };
   },
   mounted() {
