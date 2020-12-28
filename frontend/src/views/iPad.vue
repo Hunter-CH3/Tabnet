@@ -17,7 +17,8 @@
 import Vue from 'vue';
 import io from 'socket.io-client';
 import { DeviceType } from '../../../src/interfaces';
-import Thumbnail, { ItemInfo } from '../components/Thumbnail.vue';
+import Thumbnail from '../components/Thumbnail.vue';
+import { ItemInfo } from '../scene';
 
 class Pos {
   x: number;

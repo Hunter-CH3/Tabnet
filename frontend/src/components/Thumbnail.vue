@@ -14,30 +14,12 @@
 
 <script lang="ts">
 import Vue from 'vue';
-
-export class ItemInfo {
-  position: {
-    left: number;
-    top: number;
-  };
-  text: string;
-  public constructor(left: number, top: number, text?: string) {
-    this.position = { left: left, top: top };
-    this.text = text;
-  }
-}
+import { items } from '../scene';
 
 export default Vue.extend({
   data() {
     return {
-      items: [
-        new ItemInfo(100, 100),
-        new ItemInfo(300, 100),
-        new ItemInfo(500, 100),
-        new ItemInfo(100, 300),
-        // new ItemInfo(300, 300),
-        new ItemInfo(500, 300)
-      ]
+      items: items
     };
   },
   methods: {

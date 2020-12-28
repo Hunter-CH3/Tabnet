@@ -31,11 +31,6 @@ export default Vue.extend({
     window.setInterval(() => {
       this.socket.emit('message', JSON.stringify({ title: this.title, content: this.content }));
     }, 1000);
-    this.socket.on('message', (message: string) => {
-      const data = JSON.parse(message);
-      this.title = data.title;
-      this.content = data.content;
-    });
   }
 });
 </script>
