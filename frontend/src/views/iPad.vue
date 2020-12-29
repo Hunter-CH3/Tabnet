@@ -173,7 +173,7 @@ export default Vue.extend({
   } {
     return {
       deviceType: DeviceType.iPad,
-      socket: io.io('http://localhost:3000'),
+      socket: io.io(backendUrl),
       items: null,
       selID: null,
       userPos: new Pos(300, 300),

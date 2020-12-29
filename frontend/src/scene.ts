@@ -38,4 +38,4 @@ const itemsAll = {
   ]
 };
 
-export const items = itemsAll['scene4'];
+export const items = itemsAll['scene2'];
