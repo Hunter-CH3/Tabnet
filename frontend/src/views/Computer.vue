@@ -32,6 +32,13 @@
           @item-selected="handleItemSelected"
         />
       </el-dialog>
+		<img src="@/assets/asuka5.jpg" />
+	  <el-carousel indicator-position="outside">
+		<el-carousel-item v-for="item in imgs" :key="item">
+		{{ item }}
+		<img :src="item" />
+		</el-carousel-item>
+	  </el-carousel>
     </div>
   </div>
 </template>
@@ -53,7 +60,7 @@ export default Vue.extend({
       deviceType: DeviceType.Computer,
       socket: io.io('http://localhost:3000'),
       users: [],
-      isMeeting: false,
+      isMeeting: true,
       showUserButton: true,
       userDialogVisible: false,
       howToShowUsers: 'thumbnail',
@@ -63,7 +70,8 @@ export default Vue.extend({
       title: '',
       content: '',
       receiving: false,
-      selectFlag: false
+      selectFlag: false,
+	  imgs: ['@/assets/asuka5.jpg', '~@/assets/asuka6.jpg']
     };
   },
   mounted() {
@@ -114,7 +122,12 @@ export default Vue.extend({
         this.$refs.thumbnail.selectItem(-1);
         window.alert(`Greetings towards ${this.items[idx].text} sent!`);
       }
-    }
+    },
+	onImageUpload(value: any) {
+		console.log('here');
+		console.log(value.file.lastModifiedData);
+		console.log(value.file.name);
+	}
   },
   watch: {
     selId(newId: number) {
