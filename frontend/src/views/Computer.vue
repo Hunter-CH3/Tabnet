@@ -31,13 +31,14 @@
           @item-selected="handleItemSelected"
         />
       </el-dialog>
-		<img src="@/assets/asuka5.jpg" />
-	  <el-carousel indicator-position="outside">
-		<el-carousel-item v-for="item in imgs" :key="item">
-		{{ item }}
-		<img :src="item" />
+	  <div class="ppt">
+	  <el-carousel indicator-position="outside" trigger="click" @change="onImageSelect"
+	    :autoplay="false">
+		<el-carousel-item v-for="item in imgs" :key="item" align="center">
+		<img :src="item" class="img-responsive" />
 		</el-carousel-item>
 	  </el-carousel>
+	  </div>
     </div>
   </div>
 </template>
@@ -70,7 +71,11 @@ export default Vue.extend({
       content: '',
       receiving: false,
       selectFlag: false,
-	  imgs: ['@/assets/asuka5.jpg', '~@/assets/asuka6.jpg']
+	  imgs: [ require('../assets/asuka5.jpg'),
+	          require('../assets/asuka1.jpg'),
+	          require('../assets/asuka2.jpg'),
+	          require('../assets/asuka3.jpg'),
+	          require('../assets/asuka4.jpg')]
     };
   },
   mounted() {
@@ -122,10 +127,8 @@ export default Vue.extend({
         window.alert(`Greetings towards ${this.items[idx].text} sent!`);
       }
     },
-	onImageUpload(value: any) {
-		console.log('here');
-		console.log(value.file.lastModifiedData);
-		console.log(value.file.name);
+	onImageSelect(idx: any) {
+		this.socket.emit(MsgType.ScreenCast, this.imgs[idx]);
 	}
   },
   watch: {
@@ -157,5 +160,17 @@ export default Vue.extend({
 
 .el-input {
   padding: 10px 0;
+}
+
+.img-responsive {
+  display: inline-block;
+  height: auto;
+  max-width: 100%;
+}
+
+.ppt {
+  height: auto;
+  max-width: 50%;
+  text-align: center;
 }
 </style>
