@@ -204,14 +204,14 @@ export default Vue.extend({
 	  this.startTime = new Date();
     },
     onSelectEnd() {
-      this.socket.emit('message', `selected item: ${this.selID}`);
+      // this.socket.emit('message', `selected item: ${this.selID}`);
       console.log('Select end');
       this.solver = null;
       // TODO: inform the server of the end of selection
       this.socket.emit(MsgType.TableSelection, 'OnSelectEnd');
 	  // elapsed time of selecting participants
 	  const elapsedTime = (new Date()) - this.startTime;
-	  const tag = `Elapsed time(ms) of selecting ${this.items[this.selId].text} with thumbnail`
+	  const tag = `Elapsed time(ms) of selecting ? with thumbnail`
 	  this.socket.emit(MsgType.Log, JSON.stringify({ time: elapsedTime, tag: tag}));
     },
     updatePos(currentPos: Pos, newSelID: number) {
