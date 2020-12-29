@@ -29,12 +29,15 @@ class Pos {
   toString(): string {
     return `x: ${this.x}, y: ${this.y}`;
   }
+  length(): number {
+    return Math.sqrt(this.x ** 2 + this.y ** 2);
+  }
 }
 
-function getPosFromEvent(event: TouchEvent | MouseEvent): { x: number; y: number } {
+function getPosFromEvent(event: TouchEvent | MouseEvent): Pos {
   if (event instanceof TouchEvent) {
     const touches = event.touches;
-    const pos = { x: 0, y: 0 };
+    const pos = new Pos(0, 0);
     for (let i = 0; i < touches.length; i++) {
       const touch = touches.item(i);
       pos.x += touch.clientX;
@@ -69,15 +72,30 @@ class AbsoluteSelectionSolver {
     const deltaY = currentPos.y - this.startPos.y;
     const realX = this.userPos.x + deltaX / this.ratio;
     const realY = this.userPos.y + deltaY / this.ratio;
+    const direction = new Pos(deltaX / this.ratio, deltaY / this.ratio);
+    console.log('>>>>');
+    console.log(direction);
 
     let selId = null;
-    let minDisSq = 100 ** 2;
+    let minCos = null;
+    /*    let minDisSq = 100 ** 2;
     for (let i = 0; i < this.items.length; i++) {
       const item = this.items[i];
       const curDisSq = (realX - item.position.left) ** 2 + (realY - item.position.top) ** 2;
       if (curDisSq < minDisSq) {
         selId = i;
         minDisSq = curDisSq;
+      }
+    }*/
+    for (let i = 0; i < this.items.length; i++) {
+      const item = this.items[i];
+      const itemDirection = new Pos(item.position.left - this.userPos.x, item.position.top - this.userPos.y);
+      console.log(itemDirection);
+      const newCos =
+        (direction.x * itemDirection.x + direction.y * itemDirection.y) / direction.length() / itemDirection.length();
+      if (!minCos || minCos < newCos) {
+        selId = i;
+        minCos = newCos;
       }
     }
     return selId;

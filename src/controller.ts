@@ -21,8 +21,7 @@ class DeviceController {
   }
   broadcast(deviceType: DeviceType, event: string, ...data: any): void {
     this.idToSocket.forEach((value, key) => {
-      if (key.deviceType == deviceType)
-        this.emit(key, event, ...data);
+      if (key.deviceType == deviceType) this.emit(key, event, ...data);
     });
   }
 }

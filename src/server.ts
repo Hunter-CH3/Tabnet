@@ -19,7 +19,7 @@ const io = new socketio.Server(httpServer, {
   }
 });
 
-io.on('connection', function (socket: Socket) {
+io.on('connection', function(socket: Socket) {
   let deviceInfo: DeviceInfo | null;
   socket.on('init', (deviceType: DeviceType) => {
     deviceInfo = {
@@ -29,21 +29,24 @@ io.on('connection', function (socket: Socket) {
     deviceController.onConnect(deviceInfo, socket);
   });
   socket.on('message', (message: any) => deviceController.onMessage(deviceInfo, message));
-  socket.on('scenario', (message: any) =>
-    deviceController.broadcast(DeviceType.Computer, 'scenario', message));
+  socket.on('scenario', (message: any) => deviceController.broadcast(DeviceType.Computer, 'scenario', message));
   socket.on(MsgType.TableSelection, (message: any) =>
-    deviceController.broadcast(DeviceType.Computer, MsgType.TableSelection, message));
+    deviceController.broadcast(DeviceType.Computer, MsgType.TableSelection, message)
+  );
   socket.on(MsgType.PhoneToPC, (message: any) =>
-    deviceController.broadcast(DeviceType.Computer, MsgType.PhoneToPC, message));
+    deviceController.broadcast(DeviceType.Computer, MsgType.PhoneToPC, message)
+  );
   socket.on(MsgType.PCToPhone, (message: any) =>
-    deviceController.broadcast(DeviceType.Phone, MsgType.PCToPhone, message));
+    deviceController.broadcast(DeviceType.Phone, MsgType.PCToPhone, message)
+  );
   socket.on(MsgType.ScreenCast, (message: any) =>
-    deviceController.broadcast(DeviceType.Computer, MsgType.ScreenCast, message));
+    deviceController.broadcast(DeviceType.Computer, MsgType.ScreenCast, message)
+  );
   socket.once('disconnect', () => {
     if (deviceInfo) deviceController.onDisconnect(deviceInfo);
   });
 });
 
-httpServer.listen(3000, function () {
+httpServer.listen(3000, function() {
   console.log('listening on *:3000');
 });
