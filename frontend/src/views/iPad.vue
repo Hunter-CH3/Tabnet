@@ -8,7 +8,6 @@
     @mouseup="onSelectEnd"
     @mousemove="updateSelectedTarget"
   >
-    <h1>iPad</h1>
     <thumbnail ref="thumbnail" />
   </div>
 </template>
