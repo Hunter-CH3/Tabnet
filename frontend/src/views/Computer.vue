@@ -31,13 +31,13 @@
           @item-selected="handleItemSelected"
         />
       </el-dialog>
-		<img src="@/assets/asuka5.jpg" />
-	  <el-carousel indicator-position="outside">
-		<el-carousel-item v-for="item in imgs" :key="item">
-		{{ item }}
-		<img :src="item" />
-		</el-carousel-item>
-	  </el-carousel>
+      <img src="@/assets/asuka5.jpg" />
+      <el-carousel indicator-position="outside">
+        <el-carousel-item v-for="item in imgs" :key="item">
+          {{ item }}
+          <img :src="item" />
+        </el-carousel-item>
+      </el-carousel>
     </div>
   </div>
 </template>
@@ -70,7 +70,7 @@ export default Vue.extend({
       content: '',
       receiving: false,
       selectFlag: false,
-	  imgs: ['@/assets/asuka5.jpg', '~@/assets/asuka6.jpg']
+      imgs: ['@/assets/asuka5.jpg', '~@/assets/asuka6.jpg']
     };
   },
   mounted() {
@@ -122,11 +122,11 @@ export default Vue.extend({
         window.alert(`Greetings towards ${this.items[idx].text} sent!`);
       }
     },
-	onImageUpload(value: any) {
-		console.log('here');
-		console.log(value.file.lastModifiedData);
-		console.log(value.file.name);
-	}
+    onImageUpload(value: any) {
+      console.log('here');
+      console.log(value.file.lastModifiedData);
+      console.log(value.file.name);
+    }
   },
   watch: {
     selId(newId: number) {
