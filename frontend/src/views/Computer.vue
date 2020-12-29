@@ -70,15 +70,11 @@ export default Vue.extend({
       content: '',
       receiving: false,
       selectFlag: false,
-<<<<<<< HEAD
-      imgs: ['@/assets/asuka5.jpg', '~@/assets/asuka6.jpg']
-=======
 	  imgs: [ require('../assets/asuka5.jpg'),
 	          require('../assets/asuka1.jpg'),
 	          require('../assets/asuka2.jpg'),
 	          require('../assets/asuka3.jpg'),
 	          require('../assets/asuka4.jpg')]
->>>>>>> 9e64c70ee770554602667b619eee2f8df9148240
     };
   },
   mounted() {
@@ -130,17 +126,9 @@ export default Vue.extend({
         window.alert(`Greetings towards ${this.items[idx].text} sent!`);
       }
     },
-<<<<<<< HEAD
-    onImageUpload(value: any) {
-      console.log('here');
-      console.log(value.file.lastModifiedData);
-      console.log(value.file.name);
-    }
-=======
 	onImageSelect(idx: any) {
 		this.socket.emit(MsgType.ScreenCast, this.imgs[idx]);
 	}
->>>>>>> 9e64c70ee770554602667b619eee2f8df9148240
   },
   watch: {
     selId(newId: number) {
