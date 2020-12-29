@@ -8,7 +8,7 @@
     @mouseup="onSelectEnd"
     @mousemove="updateSelectedTarget"
   >
-    <thumbnail ref="thumbnail" />
+    <thumbnail ref="thumbnail" :startPos="startPos" />
   </div>
 </template>
 
@@ -18,6 +18,7 @@ import io from 'socket.io-client';
 import { DeviceType, MsgType } from '../../../src/interfaces';
 import Thumbnail from '../components/Thumbnail.vue';
 import { ItemInfo } from '../scene';
+import Promise from 'bluebird';
 import { backendUrl } from '../../../src/utils';
 
 class Pos {
@@ -68,6 +69,12 @@ abstract class BaseSelectionSolver {
     this.userPos = userPos;
     this.startPos = startPos;
   }
+  public changeUserPos(userPos: Pos): void {
+    this.userPos = userPos;
+  }
+  public changeStartPos(startPos: Pos): void {
+    this.startPos = startPos;
+  }
   public abstract solve(currentPos: Pos): number;
 }
 
@@ -78,59 +85,110 @@ class AbsoluteSelectionSolver extends BaseSelectionSolver {
     const realX = this.userPos.x + deltaX / this.ratio;
     const realY = this.userPos.y + deltaY / this.ratio;
     const direction = new Pos(deltaX / this.ratio, deltaY / this.ratio);
-    console.log('>>>>');
-    console.log(direction);
+    // console.log('>>>>');
+    // console.log(direction);
 
-    let selId = null;
+    let selID = null;
     let minCos = null;
     /*    let minDisSq = 100 ** 2;
     for (let i = 0; i < this.items.length; i++) {
       const item = this.items[i];
       const curDisSq = (realX - item.position.left) ** 2 + (realY - item.position.top) ** 2;
       if (curDisSq < minDisSq) {
-        selId = i;
+        selID = i;
         minDisSq = curDisSq;
       }
     }*/
     for (let i = 0; i < this.items.length; i++) {
       const item = this.items[i];
       const itemDirection = new Pos(item.position.left - this.userPos.x, item.position.top - this.userPos.y);
-      console.log(itemDirection);
+      // console.log(itemDirection);
       const newCos =
         (direction.x * itemDirection.x + direction.y * itemDirection.y) / direction.length() / itemDirection.length();
       if (!minCos || minCos < newCos) {
-        selId = i;
+        selID = i;
         minCos = newCos;
       }
     }
-    return selId;
+    return selID;
+  }
+  public changeUserPos(_userPos: Pos): void {
+    return;
+  }
+  public changeStartPos(_startPos: Pos): void {
+    return;
   }
 }
 
-class IncrementalSelectionSolver extends BaseSelectionSolver {}
+class IncrementalSelectionSolver extends BaseSelectionSolver {
+  public solve(currentPos: Pos): number | null {
+    const deltaX = currentPos.x - this.startPos.x;
+    const deltaY = currentPos.y - this.startPos.y;
+    // if (deltaX < 10 && deltaY < 10) return null;
+    const direction = new Pos(deltaX / this.ratio, deltaY / this.ratio);
+    // console.log('>>>>');
+    // console.log(direction);
+
+    let selID = null;
+    let minCos = null;
+    /*    let minDisSq = 100 ** 2;
+    for (let i = 0; i < this.items.length; i++) {
+      const item = this.items[i];
+      const curDisSq = (realX - item.position.left) ** 2 + (realY - item.position.top) ** 2;
+      if (curDisSq < minDisSq) {
+        selID = i;
+        minDisSq = curDisSq;
+      }
+    }*/
+    for (let i = 0; i < this.items.length; i++) {
+      const item = this.items[i];
+      const itemDirection = new Pos(item.position.left - this.userPos.x, item.position.top - this.userPos.y);
+      if (item.position.left === this.userPos.x && item.position.top === this.userPos.y) continue;
+      // console.log(itemDirection);
+      const newCos =
+        (direction.x * itemDirection.x + direction.y * itemDirection.y) / direction.length() / itemDirection.length();
+      if (!minCos || minCos < newCos) {
+        selID = i;
+        minCos = newCos;
+      }
+    }
+    return selID;
+  }
+}
 
 export default Vue.extend({
   name: 'Home',
   components: {
     Thumbnail
   },
-  data() {
+  data(): {
+    deviceType: DeviceType;
+    socket: io.Socket;
+    items: ItemInfo[] | null;
+    selID: number | null;
+    userPos: Pos;
+    startPos: Pos | null;
+    solver: BaseSelectionSolver;
+    updateStartPosPromise: Promise<void>;
+  } {
     return {
       deviceType: DeviceType.iPad,
-      socket: io.io(backendUrl),
-      users: [],
+      socket: io.io('http://localhost:3000'),
       items: null,
-      selId: null,
+      selID: null,
       userPos: new Pos(300, 300),
       solver: null,
 	  startTime: 0
+      startPos: null,
+      solver: null,
+      updateStartPosPromise: null
     };
   },
   mounted() {
     this.socket.emit('init', this.deviceType);
     this.socket.emit('message', `From ${DeviceType[this.deviceType]}`);
     this.socket.on('message', (message: any) => {
-      console.log(message);
+      // console.log(message);
     });
   },
   methods: {
@@ -138,13 +196,16 @@ export default Vue.extend({
       const thumbnail = this.$refs.thumbnail;
       this.items = thumbnail.items as ItemInfo[];
       const startPos = getPosFromEvent(event);
+      this.startPos = startPos;
       this.solver = new AbsoluteSelectionSolver(this.items, this.userPos, startPos);
+      console.log('Select start');
       // TODO: inform the server of showing thumbnail
       this.socket.emit(MsgType.TableSelection, 'OnSelectStart');
 	  this.startTime = new Date();
     },
     onSelectEnd() {
-      this.socket.emit('message', `selected item: ${this.selId}`);
+      this.socket.emit('message', `selected item: ${this.selID}`);
+      console.log('Select end');
       this.solver = null;
       // TODO: inform the server of the end of selection
       this.socket.emit(MsgType.TableSelection, 'OnSelectEnd');
@@ -153,16 +214,41 @@ export default Vue.extend({
 	  const tag = `Elapsed time(ms) of selecting ${this.items[this.selId].text} with thumbnail`
 	  this.socket.emit(MsgType.Log, JSON.stringify({ time: elapsedTime, tag: tag}));
     },
+    updatePos(currentPos: Pos, newSelID: number) {
+      let canceled = false;
+      const cancel = () => (canceled = true);
+      const promise = new Promise((): void => {
+        setTimeout(() => {
+          if (canceled) console.log('canceled');
+          else if (this.solver) {
+            const newStartPos = new Pos(this.items[newSelID].position.left, this.items[newSelID].position.top);
+            this.startPos = newStartPos;
+            this.solver.changeUserPos(newStartPos);
+            this.solver.changeStartPos(currentPos);
+          }
+        }, 500);
+      });
+      return { promise, cancel };
+    },
     updateSelectedTarget(event: TouchEvent | MouseEvent) {
       const currentPos = getPosFromEvent(event);
       if (this.solver) {
-        this.selId = this.solver.solve(currentPos);
+        const newSelID = this.solver.solve(currentPos) ?? this.selID;
+        if (newSelID != this.selID) {
+          if (newSelID) {
+            if (this.updateStartPosPromise) this.updateStartPosPromise.cancel();
+            console.log('updated');
+            this.updateStartPosPromise = this.updatePos(currentPos, newSelID);
+          }
+        }
+        console.log(newSelID);
+        this.selID = newSelID;
       }
     }
   },
   watch: {
-    selId(newId, oldId) {
-      console.log(newId, oldId);
+    selID(newId, oldId) {
+      // console.log(newId, oldId);
       if (newId !== null) {
         this.$refs.thumbnail.selectItem(newId);
         // TODO: inform the server of updating selected target
