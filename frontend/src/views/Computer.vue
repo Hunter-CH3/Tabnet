@@ -1,7 +1,6 @@
 <template>
-  <div>
-    <div v-if="!isMeeting">
-      <h1>Computer</h1>
+  <div class="computer">
+    <div v-if="!isMeeting" class="single-wrapper">
       <el-input v-model="title" placeholder="title" @input="onTextChange"></el-input>
       <el-input
         type="textarea"
@@ -143,7 +142,20 @@ export default Vue.extend({
   justify-content: flex-end;
 }
 
+.computer {
+  margin-top: 20vh;
+}
+
 #thumbnail {
   margin: 0 auto;
+}
+
+.single-wrapper {
+  width: 80%;
+  margin: 0 auto;
+}
+
+.el-input {
+  padding: 10px 0;
 }
 </style>

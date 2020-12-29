@@ -1,7 +1,8 @@
 export enum DeviceType {
   Computer = 0,
   iPad,
-  Phone
+  Phone,
+  TV
 }
 
 export interface DeviceInfo {
@@ -15,5 +16,6 @@ export enum MsgType {
   PhoneToPC = 'PHONE_TO_PC',
   SingleScenario = 'SINGLE_SCENARIO', // 单人场景，似乎不需要这个type
   MeetingScenario = 'MEETING_SCENARIO', // 会议场景，server端在终端触发，发送一个msg给PC，PC切换当前页面
-  TableSelection = 'TABLE_SELECTION' // "TableSelectOn", "TableSelectEnd", ${selectedId} server收到之后直接转发给PC就好
+  TableSelection = 'TABLE_SELECTION', // "TableSelectOn", "TableSelectEnd", ${selectedId} server收到之后直接转发给PC就好
+  ScreenCast = 'SCREEN_CAST'
 }

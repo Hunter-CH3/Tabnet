@@ -19,6 +19,11 @@ class DeviceController {
     console.log(`Messsage '${message}' from [${toString(deviceInfo)}]`);
     this.emit(deviceInfo, 'message', 'From controller');
   }
+  broadcast(deviceType: DeviceType, event: string, ...data: any): void {
+    this.idToSocket.forEach((value, key) => {
+      if (key.deviceType == deviceType) this.emit(key, event, ...data);
+    });
+  }
 }
 
 const deviceController = new DeviceController();

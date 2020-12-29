@@ -1,8 +1,13 @@
 <template>
   <div class="phone">
-    <h1>Phone</h1>
     <el-input v-model="title" placeholder="title" @input="onTextChange"></el-input>
-    <el-input v-model="content" type="textarea" placeholder="content" @input="onTextChange"></el-input>
+    <el-input
+      v-model="content"
+      type="textarea"
+      placeholder="content"
+      @input="onTextChange"
+      :autosize="{ minRows: 10 }"
+    ></el-input>
   </div>
 </template>
 
@@ -52,13 +57,10 @@ export default Vue.extend({
 .phone {
   width: 80%;
   margin: 0 auto;
+  margin-top: 20vh;
 }
 
 .el-input {
   padding: 10px 0;
-}
-
-.content {
-  min-height: 500px;
 }
 </style>

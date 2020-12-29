@@ -1,9 +1,5 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/computer">Computer</router-link> | <router-link to="/ipad">iPad</router-link> |
-      <router-link to="/phone">Phone</router-link>
-    </div>
     <router-view />
   </div>
 </template>

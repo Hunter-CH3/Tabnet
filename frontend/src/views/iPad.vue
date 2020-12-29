@@ -8,7 +8,6 @@
     @mouseup="onSelectEnd"
     @mousemove="updateSelectedTarget"
   >
-    <h1>iPad</h1>
     <thumbnail ref="thumbnail" />
   </div>
 </template>
@@ -30,12 +29,15 @@ class Pos {
   toString(): string {
     return `x: ${this.x}, y: ${this.y}`;
   }
+  length(): number {
+    return Math.sqrt(this.x ** 2 + this.y ** 2);
+  }
 }
 
-function getPosFromEvent(event: TouchEvent | MouseEvent): { x: number; y: number } {
+function getPosFromEvent(event: TouchEvent | MouseEvent): Pos {
   if (event instanceof TouchEvent) {
     const touches = event.touches;
-    const pos = { x: 0, y: 0 };
+    const pos = new Pos(0, 0);
     for (let i = 0; i < touches.length; i++) {
       const touch = touches.item(i);
       pos.x += touch.clientX;
@@ -54,25 +56,33 @@ enum SolverType {
   INCREMENTAL // 增量式修正，例如用户一开始移到了某一个位置，某物体亮；用户再向右修正（一个阈值），目标自动更新到该物体右侧的物体上
 }
 
-class AbsoluteSelectionSolver {
-  private startPos: Pos;
-  private userPos: Pos;
-  private items: ItemInfo[];
-  private tableSize = { width: 600, height: 400 };
-  private ratio = 0.4;
+abstract class BaseSelectionSolver {
+  protected startPos: Pos;
+  protected userPos: Pos;
+  protected items: ItemInfo[];
+  protected tableSize = { width: 600, height: 400 };
+  protected ratio = 0.4;
   public constructor(items: ItemInfo[], userPos: Pos, startPos: Pos) {
     this.items = items;
     this.userPos = userPos;
     this.startPos = startPos;
   }
+  public abstract solve(currentPos: Pos): number;
+}
+
+class AbsoluteSelectionSolver extends BaseSelectionSolver {
   public solve(currentPos: Pos): number {
     const deltaX = currentPos.x - this.startPos.x;
     const deltaY = currentPos.y - this.startPos.y;
     const realX = this.userPos.x + deltaX / this.ratio;
     const realY = this.userPos.y + deltaY / this.ratio;
+    const direction = new Pos(deltaX / this.ratio, deltaY / this.ratio);
+    console.log('>>>>');
+    console.log(direction);
 
     let selId = null;
-    let minDisSq = 100 ** 2;
+    let minCos = null;
+    /*    let minDisSq = 100 ** 2;
     for (let i = 0; i < this.items.length; i++) {
       const item = this.items[i];
       const curDisSq = (realX - item.position.left) ** 2 + (realY - item.position.top) ** 2;
@@ -80,10 +90,23 @@ class AbsoluteSelectionSolver {
         selId = i;
         minDisSq = curDisSq;
       }
+    }*/
+    for (let i = 0; i < this.items.length; i++) {
+      const item = this.items[i];
+      const itemDirection = new Pos(item.position.left - this.userPos.x, item.position.top - this.userPos.y);
+      console.log(itemDirection);
+      const newCos =
+        (direction.x * itemDirection.x + direction.y * itemDirection.y) / direction.length() / itemDirection.length();
+      if (!minCos || minCos < newCos) {
+        selId = i;
+        minCos = newCos;
+      }
     }
     return selId;
   }
 }
+
+class IncrementalSelectionSolver extends BaseSelectionSolver {}
 
 export default Vue.extend({
   name: 'Home',
