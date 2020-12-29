@@ -1,7 +1,6 @@
 <template>
-  <div>
-    <el-button type="primary" plain @click="toSingle">Single</el-button>
-    <el-button type="danger" plain @click="toMeeting">Meeting</el-button>
+  <div class="main">
+    <img :src="imgUrl" class="img-responsive" />
   </div>
 </template>
 
@@ -17,22 +16,31 @@ export default Vue.extend({
   name: 'Home',
   data() {
     return {
-      deviceType: DeviceType.Computer,
+      deviceType: DeviceType.TV,
       socket: io.io(backendUrl),
-      status: 'None'
+      imgUrl: ''
     };
   },
-  methods: {
-    toSingle() {
-      console.log('to single');
-      this.socket.emit('scenario', MsgType.SingleScenario);
-    },
-    toMeeting() {
-      this.socket.emit('scenario', MsgType.MeetingScenario);
-    }
+  mounted() {
+    this.socket.emit('init', this.deviceType);
+    this.socket.on(MsgType.ScreenCast, (url: string) => {
+      this.imgUrl = url;
+      console.log(url);
+    });
   }
 });
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped></style>
+<style scoped>
+.main {
+  width: auto;
+  height: auto;
+}
+
+.img-responsive {
+  display: inline-block;
+  height: auto;
+  max-width: 100%;
+}
+</style>

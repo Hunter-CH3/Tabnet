@@ -17,5 +17,6 @@ export enum MsgType {
   SingleScenario = 'SINGLE_SCENARIO', // 单人场景，似乎不需要这个type
   MeetingScenario = 'MEETING_SCENARIO', // 会议场景，server端在终端触发，发送一个msg给PC，PC切换当前页面
   TableSelection = 'TABLE_SELECTION', // "TableSelectOn", "TableSelectEnd", ${selectedId} server收到之后直接转发给PC就好
-  ScreenCast = 'SCREEN_CAST'
+  ScreenCast = 'SCREEN_CAST',
+  Log = 'LOG'
 }

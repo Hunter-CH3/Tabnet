@@ -19,6 +19,7 @@ import { DeviceType, MsgType } from '../../../src/interfaces';
 import Thumbnail from '../components/Thumbnail.vue';
 import { ItemInfo } from '../scene';
 import Promise from 'bluebird';
+import { backendUrl } from '../../../src/utils';
 
 class Pos {
   x: number;

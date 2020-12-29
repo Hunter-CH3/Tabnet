@@ -15,13 +15,14 @@
 import Vue from 'vue';
 import io from 'socket.io-client';
 import { DeviceType, MsgType } from '../../../src/interfaces';
+import { backendUrl } from '../../../src/utils';
 
 export default Vue.extend({
   name: 'Home',
   data() {
     return {
       deviceType: DeviceType.Phone,
-      socket: io.io('http://localhost:3000'),
+      socket: io.io(backendUrl),
       users: [],
       title: '',
       content: '',

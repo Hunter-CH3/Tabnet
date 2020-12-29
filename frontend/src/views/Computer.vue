@@ -13,15 +13,16 @@
     </div>
     <div v-else>
       <div class="menu-wrapper">
-        <el-button v-if="showUserButton" type="primary" @click="userDialogVisible = !userDialogVisible"
+        <el-button v-if="showUserButton" type="primary" @click="showParticipant"
           >显示与会者</el-button
         >
+		<el-button type="warning" @click="changeSelMode">{{ howToShowUsers }}</el-button>
       </div>
       <div class="file-gallery"></div>
       <el-dialog title="与会者" :visible.sync="userDialogVisible">
         <div v-if="howToShowUsers === 'list'">
           <div v-for="(item, idx) in items" :key="idx" @click="handleItemSelected(idx)">
-            {{ item.text }}
+            <el-button>{{ item.text }}</el-button>
           </div>
         </div>
         <thumbnail
@@ -31,13 +32,13 @@
           @item-selected="handleItemSelected"
         />
       </el-dialog>
-		<img src="@/assets/asuka5.jpg" />
-	  <el-carousel indicator-position="outside">
-		<el-carousel-item v-for="item in imgs" :key="item">
-		{{ item }}
-		<img :src="item" />
-		</el-carousel-item>
-	  </el-carousel>
+      <div class="ppt">
+        <el-carousel indicator-position="outside" trigger="click" @change="onImageSelect" :autoplay="false">
+          <el-carousel-item v-for="item in imgs" :key="item" align="center">
+            <img :src="item" class="img-responsive" />
+          </el-carousel-item>
+        </el-carousel>
+      </div>
     </div>
   </div>
 </template>
@@ -48,6 +49,7 @@ import io from 'socket.io-client';
 import Thumbnail from '../components/Thumbnail.vue';
 import { items } from '../scene';
 import { DeviceType, MsgType } from '../../../src/interfaces';
+import { backendUrl } from '../../../src/utils';
 
 export default Vue.extend({
   name: 'Home',
@@ -57,7 +59,7 @@ export default Vue.extend({
   data() {
     return {
       deviceType: DeviceType.Computer,
-      socket: io.io('http://localhost:3000'),
+      socket: io.io(backendUrl),
       users: [],
       isMeeting: true,
       showUserButton: true,
@@ -70,7 +72,14 @@ export default Vue.extend({
       content: '',
       receiving: false,
       selectFlag: false,
-	  imgs: ['@/assets/asuka5.jpg', '~@/assets/asuka6.jpg']
+      imgs: [
+        require('../assets/asuka5.jpg'),
+        require('../assets/asuka1.jpg'),
+        require('../assets/asuka2.jpg'),
+        require('../assets/asuka3.jpg'),
+        require('../assets/asuka4.jpg')
+      ],
+	  startTime: 0
     };
   },
   mounted() {
@@ -117,15 +126,26 @@ export default Vue.extend({
     },
     handleItemSelected(idx: number) {
       if (!this.selectFlag) {
+		// elapsed time of selecting participants
+		const elapsedTime = (new Date()) - this.startTime;
+		const tag = `Elapsed time(ms) of selecting ${this.items[idx].text} with ${this.howToShowUsers}`
+		this.socket.emit(MsgType.Log, JSON.stringify({ time: elapsedTime, tag: tag}));
+		// alert
         this.userDialogVisible = false;
         this.$refs.thumbnail.selectItem(-1);
         window.alert(`Greetings towards ${this.items[idx].text} sent!`);
       }
     },
-	onImageUpload(value: any) {
-		console.log('here');
-		console.log(value.file.lastModifiedData);
-		console.log(value.file.name);
+    onImageSelect(idx: any) {
+      this.socket.emit(MsgType.ScreenCast, this.imgs[idx]);
+    },
+	changeSelMode() {
+	  if (this.howToShowUsers == "list") this.howToShowUsers = "thumbnail";
+	  else this.howToShowUsers = "list";
+	},
+	showParticipant() {
+	  this.startTime = new Date();
+	  this.userDialogVisible = !(this.userDialogVisible);
 	}
   },
   watch: {
@@ -157,5 +177,17 @@ export default Vue.extend({
 
 .el-input {
   padding: 10px 0;
+}
+
+.img-responsive {
+  display: inline-block;
+  height: auto;
+  max-width: 100%;
+}
+
+.ppt {
+  height: auto;
+  max-width: 50%;
+  text-align: center;
 }
 </style>
