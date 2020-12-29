@@ -14,7 +14,7 @@ const httpServer = new http.Server(app);
 
 const io = new socketio.Server(httpServer, {
   cors: {
-    origin: 'http://localhost:8080',
+    // origin: 'http://localhost:8080',
     methods: ['GET', 'POST']
   }
 });

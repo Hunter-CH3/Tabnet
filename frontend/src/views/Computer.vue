@@ -13,15 +13,16 @@
     </div>
     <div v-else>
       <div class="menu-wrapper">
-        <el-button v-if="showUserButton" type="primary" @click="userDialogVisible = !userDialogVisible"
+        <el-button v-if="showUserButton" type="primary" @click="showParticipant"
           >显示与会者</el-button
         >
+		<el-button type="warning" @click="changeSelMode">{{ howToShowUsers }}</el-button>
       </div>
       <div class="file-gallery"></div>
       <el-dialog title="与会者" :visible.sync="userDialogVisible">
         <div v-if="howToShowUsers === 'list'">
           <div v-for="(item, idx) in items" :key="idx" @click="handleItemSelected(idx)">
-            {{ item.text }}
+            <el-button>{{ item.text }}</el-button>
           </div>
         </div>
         <thumbnail
@@ -77,7 +78,8 @@ export default Vue.extend({
         require('../assets/asuka2.jpg'),
         require('../assets/asuka3.jpg'),
         require('../assets/asuka4.jpg')
-      ]
+      ],
+	  startTime: 0
     };
   },
   mounted() {
@@ -127,11 +129,23 @@ export default Vue.extend({
         this.userDialogVisible = false;
         this.$refs.thumbnail.selectItem(-1);
         window.alert(`Greetings towards ${this.items[idx].text} sent!`);
+		// elapsed time of selecting participants
+		const elapsedTime = (new Date()) - this.startTime;
+		const tag = `Elapsed time of selecting ${this.items[idx].text} with ${this.howToShowUsers}`
+		this.socket.emit(MsgType.Log, JSON.stringify({ time: elapsedTime, tag: tag}));
       }
     },
     onImageSelect(idx: any) {
       this.socket.emit(MsgType.ScreenCast, this.imgs[idx]);
-    }
+    },
+	changeSelMode() {
+	  if (this.howToShowUsers == "list") this.howToShowUsers = "thumbnail";
+	  else this.howToShowUsers = "list";
+	},
+	showParticipant() {
+	  this.startTime = new Date();
+	  this.userDialogVisible = !(this.userDialogVisible);
+	}
   },
   watch: {
     selId(newId: number) {
