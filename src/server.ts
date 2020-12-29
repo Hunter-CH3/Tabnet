@@ -42,6 +42,9 @@ io.on('connection', function (socket: Socket) {
   socket.on(MsgType.ScreenCast, (message: any) =>
     deviceController.broadcast(DeviceType.TV, MsgType.ScreenCast, message)
   );
+  socket.on(MsgType.Log, (message: any) => {
+    console.log(`[LOG][${new Date().toLocaleString()}] ${message}`)
+  });
   socket.once('disconnect', () => {
     if (deviceInfo) deviceController.onDisconnect(deviceInfo);
   });
