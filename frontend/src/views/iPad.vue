@@ -178,9 +178,8 @@ export default Vue.extend({
       selID: null,
       userPos: new Pos(300, 300),
       solver: null,
-	  startTime: 0
+	  startTime: 0,
       startPos: null,
-      solver: null,
       updateStartPosPromise: null
     };
   },
