@@ -90,10 +90,13 @@ export default Vue.extend({
       console.log(message);
     });
     this.socket.on('scenario', (message: any) => {
-      this.status = message;
-      if (this.status == MsgType.SingleScenario) this.isMeeting = false;
-      else this.isMeeting = true;
-      console.log(message);
+	  const nextMode = message == MsgType.SingleScenario ? "single scenario" : "meeting scenario";
+	  const tip = `A change request to ${nextMode} received, accept ?`;
+	  if (confirm(tip)) {
+        this.status = message;
+        if (this.status == MsgType.SingleScenario) this.isMeeting = false;
+        else this.isMeeting = true;
+	  }
     });
     // receive sync message from phone
     this.socket.on(MsgType.PhoneToPC, (message: string) => {
