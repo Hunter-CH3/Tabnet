@@ -11,13 +11,14 @@ import io from 'socket.io-client';
 import Thumbnail from '../components/Thumbnail.vue';
 import { items } from '../scene';
 import { DeviceType, MsgType } from '../../../src/interfaces';
+import { backendUrl } from '../../../src/utils';
 
 export default Vue.extend({
   name: 'Home',
   data() {
     return {
       deviceType: DeviceType.Computer,
-      socket: io.io('http://localhost:3000'),
+      socket: io.io(backendUrl),
       status: 'None'
     };
   },

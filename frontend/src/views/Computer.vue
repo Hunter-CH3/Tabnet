@@ -48,6 +48,7 @@ import io from 'socket.io-client';
 import Thumbnail from '../components/Thumbnail.vue';
 import { items } from '../scene';
 import { DeviceType, MsgType } from '../../../src/interfaces';
+import { backendUrl } from '../../../src/utils';
 
 export default Vue.extend({
   name: 'Home',
@@ -57,7 +58,7 @@ export default Vue.extend({
   data() {
     return {
       deviceType: DeviceType.Computer,
-      socket: io.io('http://localhost:3000'),
+      socket: io.io(backendUrl),
       users: [],
       isMeeting: true,
       showUserButton: true,
@@ -70,11 +71,13 @@ export default Vue.extend({
       content: '',
       receiving: false,
       selectFlag: false,
-	  imgs: [ require('../assets/asuka5.jpg'),
-	          require('../assets/asuka1.jpg'),
-	          require('../assets/asuka2.jpg'),
-	          require('../assets/asuka3.jpg'),
-	          require('../assets/asuka4.jpg')]
+      imgs: [
+        require('../assets/asuka5.jpg'),
+        require('../assets/asuka1.jpg'),
+        require('../assets/asuka2.jpg'),
+        require('../assets/asuka3.jpg'),
+        require('../assets/asuka4.jpg')
+      ]
     };
   },
   mounted() {
@@ -126,9 +129,9 @@ export default Vue.extend({
         window.alert(`Greetings towards ${this.items[idx].text} sent!`);
       }
     },
-	onImageSelect(idx: any) {
-		this.socket.emit(MsgType.ScreenCast, this.imgs[idx]);
-	}
+    onImageSelect(idx: any) {
+      this.socket.emit(MsgType.ScreenCast, this.imgs[idx]);
+    }
   },
   watch: {
     selId(newId: number) {

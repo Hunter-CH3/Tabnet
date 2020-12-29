@@ -18,6 +18,7 @@ import io from 'socket.io-client';
 import { DeviceType, MsgType } from '../../../src/interfaces';
 import Thumbnail from '../components/Thumbnail.vue';
 import { ItemInfo } from '../scene';
+import { backendUrl } from '../../../src/utils';
 
 class Pos {
   x: number;
@@ -116,7 +117,7 @@ export default Vue.extend({
   data() {
     return {
       deviceType: DeviceType.iPad,
-      socket: io.io('http://localhost:3000'),
+      socket: io.io(backendUrl),
       users: [],
       items: null,
       selId: null,
