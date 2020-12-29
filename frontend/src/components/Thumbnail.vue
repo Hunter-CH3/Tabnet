@@ -8,7 +8,7 @@
       :style="{ left: item.position.left + 'px', top: item.position.top + 'px' }"
       ref="thumbnail-items"
     >
-      {{ item.text }}
+      <p class="thumbnail-item-text">{{ item.text }}</p>
     </div>
   </div>
 </template>
@@ -55,6 +55,14 @@ export default Vue.extend({
   background-color: chocolate;
   margin-left: calc(var(--item-size) * -0.5);
   margin-top: calc(var(--item-size) * -0.5);
+}
+
+.thumbnail-item-text {
+  font-size: 20px;
+}
+
+.thumbnail-item .thumbnail-item-text {
+  margin-top: calc(var(--item-size) + 10px);
 }
 
 .thumbnail-item.selected {

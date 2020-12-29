@@ -62,7 +62,8 @@ export default Vue.extend({
       status: 'None',
       title: '',
       content: '',
-      receiving: false
+      receiving: false,
+      selectFlag: false
     };
   },
   mounted() {
@@ -74,8 +75,8 @@ export default Vue.extend({
     });
     this.socket.on('scenario', (message: any) => {
       this.status = message;
-	  if (this.status == MsgType.SingleScenario) this.isMeeting = false;
-	  else this.isMeeting = true;
+      if (this.status == MsgType.SingleScenario) this.isMeeting = false;
+      else this.isMeeting = true;
       console.log(message);
     });
     // receive sync message from phone
@@ -87,9 +88,12 @@ export default Vue.extend({
     });
 
     this.socket.on(MsgType.TableSelection, (message: string) => {
-      if (message === 'TableSelectOn') {
+      console.log(message);
+      if (message === 'OnSelectStart') {
         this.userDialogVisible = true;
-      } else if (message === 'TableSelectEnd') {
+        this.selectFlag = true;
+      } else if (message === 'OnSelectEnd') {
+        this.selectFlag = false;
         this.handleItemSelected(this.selId);
       } else {
         this.selId = Number.parseInt(message);
@@ -105,9 +109,11 @@ export default Vue.extend({
       this.socket.emit(MsgType.PCToPhone, JSON.stringify({ title: this.title, content: this.content }));
     },
     handleItemSelected(idx: number) {
-      console.log(idx);
-      this.userDialogVisible = false;
-      this.$refs.thumbnail.selectItem(-1);
+      if (!this.selectFlag) {
+        this.userDialogVisible = false;
+        this.$refs.thumbnail.selectItem(-1);
+        window.alert(`Greetings towards ${this.items[idx].text} sent!`);
+      }
     }
   },
   watch: {
