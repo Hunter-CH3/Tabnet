@@ -18,17 +18,17 @@ export default Vue.extend({
     return {
       deviceType: DeviceType.Computer,
       socket: io.io('http://localhost:3000'),
-      status: 'None',
+      status: 'None'
     };
   },
   methods: {
-	toSingle() {
-	  console.log("to single");
-	  this.socket.emit('scenario', MsgType.SingleScenario);
-	},
-	toMeeting() {
-	  this.socket.emit('scenario', MsgType.MeetingScenario);
-	}
+    toSingle() {
+      console.log('to single');
+      this.socket.emit('scenario', MsgType.SingleScenario);
+    },
+    toMeeting() {
+      this.socket.emit('scenario', MsgType.MeetingScenario);
+    }
   }
 });
 </script>

@@ -56,17 +56,21 @@ enum SolverType {
   INCREMENTAL // 增量式修正，例如用户一开始移到了某一个位置，某物体亮；用户再向右修正（一个阈值），目标自动更新到该物体右侧的物体上
 }
 
-class AbsoluteSelectionSolver {
-  private startPos: Pos;
-  private userPos: Pos;
-  private items: ItemInfo[];
-  private tableSize = { width: 600, height: 400 };
-  private ratio = 0.4;
+abstract class BaseSelectionSolver {
+  protected startPos: Pos;
+  protected userPos: Pos;
+  protected items: ItemInfo[];
+  protected tableSize = { width: 600, height: 400 };
+  protected ratio = 0.4;
   public constructor(items: ItemInfo[], userPos: Pos, startPos: Pos) {
     this.items = items;
     this.userPos = userPos;
     this.startPos = startPos;
   }
+  public abstract solve(currentPos: Pos): number;
+}
+
+class AbsoluteSelectionSolver extends BaseSelectionSolver {
   public solve(currentPos: Pos): number {
     const deltaX = currentPos.x - this.startPos.x;
     const deltaY = currentPos.y - this.startPos.y;
@@ -101,6 +105,8 @@ class AbsoluteSelectionSolver {
     return selId;
   }
 }
+
+class IncrementalSelectionSolver extends BaseSelectionSolver {}
 
 export default Vue.extend({
   name: 'Home',

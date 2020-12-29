@@ -30,9 +30,9 @@ const routes: Array<RouteConfig> = [
     component: Phone
   },
   {
-	path: '/backdoor',
-	name: 'backdoor',
-	component: BackDoor
+    path: '/backdoor',
+    name: 'backdoor',
+    component: BackDoor
   }
 ];
 
