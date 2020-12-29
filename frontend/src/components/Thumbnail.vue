@@ -1,5 +1,6 @@
 <template>
   <div class="thumbnail">
+    <span>{{ startPos ? startPos.x + ' ' + startPos.y : 'NULL' }}</span>
     <div
       class="thumbnail-item"
       v-for="(item, idx) in items"
@@ -35,6 +36,9 @@ export default Vue.extend({
         }
       }
     }
+  },
+  props: {
+    startPos: {}
   }
 });
 </script>
