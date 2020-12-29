@@ -127,9 +127,12 @@ export default Vue.extend({
     handleItemSelected(idx: number) {
       if (!this.selectFlag) {
 		// elapsed time of selecting participants
-		const elapsedTime = (new Date()) - this.startTime;
-		const tag = `Elapsed time(ms) of selecting ${this.items[idx].text} with ${this.howToShowUsers}`
-		this.socket.emit(MsgType.Log, JSON.stringify({ time: elapsedTime, tag: tag}));
+		// thumbnail method is recorded on ipad
+		if (this.howToShowUsers == "list") {
+		  const elapsedTime = (new Date()) - this.startTime;
+		  const tag = `Elapsed time(ms) of selecting ${this.items[idx].text} with ${this.howToShowUsers}`
+		  this.socket.emit(MsgType.Log, JSON.stringify({ time: elapsedTime, tag: tag}));
+		}
 		// alert
         this.userDialogVisible = false;
         this.$refs.thumbnail.selectItem(-1);

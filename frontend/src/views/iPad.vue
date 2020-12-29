@@ -122,7 +122,8 @@ export default Vue.extend({
       items: null,
       selId: null,
       userPos: new Pos(300, 300),
-      solver: null
+      solver: null,
+	  startTime: 0
     };
   },
   mounted() {
@@ -140,12 +141,17 @@ export default Vue.extend({
       this.solver = new AbsoluteSelectionSolver(this.items, this.userPos, startPos);
       // TODO: inform the server of showing thumbnail
       this.socket.emit(MsgType.TableSelection, 'OnSelectStart');
+	  this.startTime = new Date();
     },
     onSelectEnd() {
       this.socket.emit('message', `selected item: ${this.selId}`);
       this.solver = null;
       // TODO: inform the server of the end of selection
       this.socket.emit(MsgType.TableSelection, 'OnSelectEnd');
+	  // elapsed time of selecting participants
+	  const elapsedTime = (new Date()) - this.startTime;
+	  const tag = `Elapsed time(ms) of selecting ${this.items[this.selId].text} with thumbnail`
+	  this.socket.emit(MsgType.Log, JSON.stringify({ time: elapsedTime, tag: tag}));
     },
     updateSelectedTarget(event: TouchEvent | MouseEvent) {
       const currentPos = getPosFromEvent(event);
